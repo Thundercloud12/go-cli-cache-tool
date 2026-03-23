@@ -6,6 +6,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"os"
 
@@ -43,26 +44,67 @@ func loadJsonFile() ([]Command, error) {
 	return commands, nil
 }
 
+var listTags string
+
 // showCmd represents the show command
 var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "A brief description of your command",
-	Long:  `A function to load the commands from the json file and display them in a user-friendly format. This function will read the JSON file, parse the commands, and print them to the console in a structured way.`,
+	Use:   "list",
+	Short: "List all commands or filter by tags",
+	Long:  `List all commands or filter by specific tags. Use -t or --tags to filter by comma-separated tags.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		commands, err := loadJsonFile()
 		if err != nil {
-			fmt.Println("Error hai", err)
+			fmt.Println("Error loading commands:", err)
 			return
 		}
 
-		for i, cmd := range commands {
-			fmt.Println(i+1, cmd.Value, cmd.Tags)
+		if len(commands) == 0 {
+			fmt.Println("No commands found. Add one with: my-tool add <command> -t tag1,tag2")
+			return
+		}
+
+		// Filter by tags if provided
+		var filtered []Command
+		if listTags != "" {
+			requiredTags := strings.Split(listTags, ",")
+			for _, c := range commands {
+				if containsAnyTag(c.Tags, requiredTags) {
+					filtered = append(filtered, c)
+				}
+			}
+		} else {
+			filtered = commands
+		}
+
+		if len(filtered) == 0 {
+			fmt.Printf("No commands found with tags: %s\n", listTags)
+			return
+		}
+
+		fmt.Println("\nCommands:")
+		for i, c := range filtered {
+			fmt.Printf("%d. %s\n", i+1, c.Value)
+			if len(c.Tags) > 0 {
+				fmt.Printf("   Tags: %s\n", strings.Join(c.Tags, ", "))
+			}
 		}
 	},
 }
 
+func containsAnyTag(commandTags, requiredTags []string) bool {
+	for _, req := range requiredTags {
+		for _, tag := range commandTags {
+			if tag == req {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func init() {
 	rootCmd.AddCommand(showCmd)
+	showCmd.Flags().StringVarP(&listTags, "tags", "t", "", "Filter by tags (comma-separated)")
 
 	// Here you will define your flags and configuration settings.
 

@@ -1,1 +1,1 @@
-[{"id":"0e1e97a1-a2b2-4453-9a30-e0460ce5581e","value":"python main.py","tags":["python","runner"]}]
+[{"id":"38743340-2e9f-415c-96fc-646906940dcf","value":"npm run dev","tags":["node","react"]},{"id":"ddea0c10-1edf-41b7-8486-a1a668884af4","value":"go test -v","tags":["go","testing"]}]

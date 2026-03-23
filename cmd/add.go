@@ -78,7 +78,7 @@ var addCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(addCmd)
 
-	addCmd.Flags().StringVar(&tags, "tags", "", "Tags for the command")
+	addCmd.Flags().StringVarP(&tags, "tags", "t", "", "Tags for the command")
 
 	// Here you will define your flags and configuration settings.
 
